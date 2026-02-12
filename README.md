@@ -5,6 +5,7 @@
 - [Rancher instalat](https://github.com/rancher-sandbox/rancher-desktop/releases)
 - [Intellij](https://www.jetbrains.com/idea/download)
 - [DBeaver](https://dbeaver.io/download/)
+- [Postman](https://www.postman.com/)
 
 Pentru a verifica daca docker si docker compose sunt instalate, deschideti un powershell si executati comenzile:
 - `docker -v`. Ar trebui sa vedeti versiunea si build-ul instalat:
@@ -19,6 +20,7 @@ JDK-ul il vom instala folosind intellij, deci nu e nevoie sa il instalati separa
 - [Docker compose](https://docs.docker.com/compose/install/linux/)
 - [Intellij](https://www.jetbrains.com/idea/download)
 - [DBeaver](https://dbeaver.io/download/)
+- [Postman](https://www.postman.com/)
 
 Ca sa verificati daca docker si docker compose sunt instalate, urmati aceiasi pasi ca si pentru Windows, dar folositi terminalul in loc de powershell.
 
