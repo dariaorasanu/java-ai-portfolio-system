@@ -4,14 +4,19 @@ import com.fiipractic.stocks.dto.AddStockRequest;
 import com.fiipractic.stocks.dto.CreatePortfolioRequest;
 import com.fiipractic.stocks.dto.PortfolioDTO;
 import com.fiipractic.stocks.dto.StockDTO;
+import com.fiipractic.stocks.exception.PortfolioNotFoundException;
+import com.fiipractic.stocks.exception.UserNotFoundException;
 import com.fiipractic.stocks.model.Portfolio;
 import com.fiipractic.stocks.model.Stock;
 import com.fiipractic.stocks.model.User;
 import com.fiipractic.stocks.repository.PortfolioRepository;
 import com.fiipractic.stocks.repository.StockRepository;
 import com.fiipractic.stocks.repository.UserRepository;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,9 +29,10 @@ public class PortfolioService {
     private final UserRepository userRepository;
     private final StockRepository stockRepository;
 
+    @Transactional
     public PortfolioDTO createPortfolio(String username, CreatePortfolioRequest portfolioRequest) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found: " + username));
+                .orElseThrow(() -> new UserNotFoundException("User not found: " + username));
 
         Portfolio portfolio = Portfolio.builder()
                 .name(portfolioRequest.getName())
@@ -36,24 +42,28 @@ public class PortfolioService {
         return convertToDTO(portfolioRepository.save(portfolio));
     }
 
+    @Transactional(readOnly = true)
     public List<PortfolioDTO> getUserPortfolios(String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found: " + username));
+                .orElseThrow(() -> new UserNotFoundException("User not found: " + username));
 
         return portfolioRepository.findByUserId(user.getId())
                 .stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
+    @Transactional
     public PortfolioDTO addStock(Long portfolioId, AddStockRequest stockRequest) {
         Portfolio portfolio = portfolioRepository.findById(portfolioId)
-                .orElseThrow(() -> new RuntimeException("Portfolio not found: " + portfolioId));
+                .orElseThrow(() -> new PortfolioNotFoundException("Portfolio not found: " + portfolioId));
 
         Stock stock = Stock.builder()
                 .symbol(stockRequest.getSymbol().toUpperCase())
                 .quantity(stockRequest.getQuantity())
                 .purchasePrice(stockRequest.getPurchasePrice())
                 .portfolio(portfolio).build();
-        stockRepository.save(stock);
+
+        Stock savedStock = stockRepository.save(stock);
+        portfolio.getStocks().add(savedStock);
 
         return convertToDTO(portfolio);
     }

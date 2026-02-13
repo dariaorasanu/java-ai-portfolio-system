@@ -1,9 +1,13 @@
 package com.fiipractic.stocks.controller;
 
+import com.fiipractic.stocks.dto.CreateUserRequest;
+import com.fiipractic.stocks.dto.UserDTO;
+import com.fiipractic.stocks.service.UserService;
 
-import com.fiipractic.stocks.model.User;
-import com.fiipractic.stocks.repository.UserRepository;
+import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,10 +20,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(userRepository.save(user));
+    public ResponseEntity<UserDTO> createUser(@Valid @RequestBody CreateUserRequest request) {
+        UserDTO userDTO = userService.createUser(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(userDTO);
     }
 }
