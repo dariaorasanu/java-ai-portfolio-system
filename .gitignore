@@ -31,3 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# customs
+postgres_data
+.mvn
+.gitattributes
