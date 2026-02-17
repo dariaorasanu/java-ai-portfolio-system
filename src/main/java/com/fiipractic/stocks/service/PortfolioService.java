@@ -13,8 +13,6 @@ import com.fiipractic.stocks.repository.PortfolioRepository;
 import com.fiipractic.stocks.repository.StockRepository;
 import com.fiipractic.stocks.repository.UserRepository;
 
-import lombok.RequiredArgsConstructor;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,12 +20,17 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class PortfolioService {
 
     private final PortfolioRepository portfolioRepository;
     private final UserRepository userRepository;
     private final StockRepository stockRepository;
+
+    public PortfolioService(PortfolioRepository portfolioRepository, UserRepository userRepository, StockRepository stockRepository) {
+        this.portfolioRepository = portfolioRepository;
+        this.userRepository = userRepository;
+        this.stockRepository = stockRepository;
+    }
 
     @Transactional
     public PortfolioDTO createPortfolio(String username, CreatePortfolioRequest portfolioRequest) {

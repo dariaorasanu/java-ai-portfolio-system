@@ -6,16 +6,17 @@ import com.fiipractic.stocks.exception.DuplicateUserException;
 import com.fiipractic.stocks.model.User;
 import com.fiipractic.stocks.repository.UserRepository;
 
-import lombok.RequiredArgsConstructor;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
+
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Transactional
     public UserDTO createUser(CreateUserRequest request) {

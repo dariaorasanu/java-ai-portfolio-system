@@ -3,18 +3,38 @@ package com.fiipractic.stocks.dto;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
 
 import java.math.BigDecimal;
 
-@Getter
 public class AddStockRequest {
     @NotBlank(message = "Symbol is required")
-    String symbol;
+    private String symbol;
 
     @Min(value = 1, message = "Quantity must be at least 1")
-    Integer quantity;
+    private Integer quantity;
 
     @DecimalMin(value = "0.01", message = "Purchase price must be positive")
-    BigDecimal purchasePrice;
+    private BigDecimal purchasePrice;
+
+    public AddStockRequest() {
+    }
+
+    public AddStockRequest(String symbol, Integer quantity, BigDecimal purchasePrice) {
+        this.symbol = symbol;
+        this.quantity = quantity;
+        this.purchasePrice = purchasePrice;
+    }
+
+    public String getSymbol() {
+        return symbol;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public BigDecimal getPurchasePrice() {
+        return purchasePrice;
+    }
+
 }
