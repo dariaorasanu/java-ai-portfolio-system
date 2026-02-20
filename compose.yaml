@@ -15,6 +15,29 @@ services:
     networks:
       - stocks-network
 
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: keycloak
+    restart: unless-stopped
+    command: start-dev --import-realm
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/fiipractic?currentSchema=keycloak
+      KC_DB_USERNAME: keycloakuser
+      KC_DB_PASSWORD: keycloakpassword
+      KC_DB_SCHEMA: keycloak
+      KC_HOSTNAME: localhost
+    ports:
+      - '8080:8080'
+    volumes:
+      - ./realm-config/stock-realm.json:/opt/keycloak/data/import/stock-realm.json
+    networks:
+      - stocks-network
+    depends_on:
+      - postgres
+
 networks:
   stocks-network:
     driver: bridge
