@@ -23,6 +23,8 @@
       "username": "john_doe",
       "enabled": true,
       "email": "johndoe@example.com",
+      "firstName": "John",
+      "lastName": "Doe",
       "credentials": [{ "type": "password", "value": "password", "temporary": false }],
       "realmRoles": ["USER"]
     },
@@ -30,6 +32,8 @@
       "username": "jane_premium",
       "enabled": true,
       "email": "janepremium@example.com",
+      "firstName": "Jane",
+      "lastName": "Premium",
       "credentials": [{ "type": "password", "value": "password", "temporary": false }],
       "realmRoles": ["USER", "PREMIUM"]
     },
@@ -37,6 +41,8 @@
       "username": "admin",
       "enabled": true,
       "email": "admin@example.com",
+      "firstName": "Admin",
+      "lastName": "User",
       "credentials": [{ "type": "password", "value": "admin", "temporary": false }],
       "realmRoles": ["USER", "ADMIN"]
     }
