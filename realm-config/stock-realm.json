@@ -11,7 +11,7 @@
   "clients": [{
     "clientId": "stock-analyzer-app",
     "enabled": true,
-    "publicClient": false,
+    "publicClient": true,
     "serviceAccountsEnabled": true,
     "directAccessGrantsEnabled": true,
     "standardFlowEnabled": true,
