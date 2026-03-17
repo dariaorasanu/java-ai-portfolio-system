@@ -28,29 +28,24 @@ public class PortfolioController {
 
     @PostMapping
     public ResponseEntity<PortfolioDTO> createPortfolio(
-            @RequestParam String username,
+            @AuthenticationPrincipal Jwt jwt,
             @Valid @RequestBody CreatePortfolioRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(portfolioService.createPortfolio(username, request));
-    }
-
-    @GetMapping
-    public ResponseEntity<List<PortfolioDTO>> getUserPortfolios(@RequestParam String username) {
-        return ResponseEntity.ok(portfolioService.getUserPortfolios(username));
-    }
-
-    @PostMapping("/{portfolioId}/stocks")
-    public ResponseEntity<PortfolioDTO> addStock(
-            @PathVariable Long portfolioId,
-            @Valid @RequestBody AddStockRequest request) {
-        return ResponseEntity.ok(portfolioService.addStock(portfolioId, request));
+                .body(portfolioService.createPortfolio(jwt.getSubject(), request));
     }
 
     @GetMapping("/my")
     @PreAuthorize("hasAnyRole('USER', 'PREMIUM', 'ADMIN')")
     public ResponseEntity<List<PortfolioDTO>> getMyPortfolios(
             @AuthenticationPrincipal Jwt jwt) {
-        String username = jwt.getClaimAsString("preferred_username");
-        return ResponseEntity.ok(portfolioService.getUserPortfolios(username));
+        return ResponseEntity.ok(portfolioService.getUserPortfolios(jwt.getSubject()));
+    }
+
+    @PostMapping("/{portfolioId}/stocks")
+    public ResponseEntity<PortfolioDTO> addStock(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable Long portfolioId,
+            @Valid @RequestBody AddStockRequest request) {
+        return ResponseEntity.ok(portfolioService.addStock(jwt.getSubject(), portfolioId, request));
     }
 }
