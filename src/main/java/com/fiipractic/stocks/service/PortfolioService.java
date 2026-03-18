@@ -13,6 +13,7 @@ import com.fiipractic.stocks.repository.StockRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,6 +33,7 @@ public class PortfolioService {
         Portfolio portfolio = Portfolio.builder()
                 .name(portfolioRequest.getName())
                 .description(portfolioRequest.getDescription())
+                .stocks(new ArrayList<>())
                 .userId(userId).build();
 
         return convertToDTO(portfolioRepository.save(portfolio));
