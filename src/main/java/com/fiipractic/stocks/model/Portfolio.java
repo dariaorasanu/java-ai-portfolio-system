@@ -29,7 +29,7 @@ public class Portfolio {
     private String userId;
 
     @OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Stock> stocks = new ArrayList<>();
+    private List<PortfolioHolding> holdings = new ArrayList<>();
 
     @CreatedDate
     private LocalDateTime createdAt;
@@ -40,12 +40,12 @@ public class Portfolio {
     public Portfolio() {
     }
 
-    public Portfolio(Long id, String name, String description, String userId, List<Stock> stocks, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public Portfolio(Long id, String name, String description, String userId, List<PortfolioHolding> holdings, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.userId = userId;
-        this.stocks = stocks;
+        this.holdings = holdings;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -86,12 +86,12 @@ public class Portfolio {
         this.userId = userId;
     }
 
-    public List<Stock> getStocks() {
-        return stocks;
+    public List<PortfolioHolding> getHoldings() {
+        return holdings;
     }
 
-    public void setStocks(List<Stock> stocks) {
-        this.stocks = stocks;
+    public void setHoldings(List<PortfolioHolding> holdings) {
+        this.holdings = holdings;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -128,7 +128,7 @@ public class Portfolio {
         private String name;
         private String description;
         private String userId;
-        private List<Stock> stocks;
+        private List<PortfolioHolding> holdings;
         private LocalDateTime createdAt;
         private LocalDateTime updatedAt;
 
@@ -152,8 +152,8 @@ public class Portfolio {
             return this;
         }
 
-        public Builder stocks(List<Stock> stocks) {
-            this.stocks = stocks;
+        public Builder holdings(List<PortfolioHolding> holdings) {
+            this.holdings = holdings;
             return this;
         }
 
@@ -168,7 +168,7 @@ public class Portfolio {
         }
 
         public Portfolio build() {
-            return new Portfolio(id, name, description, userId, stocks, createdAt, updatedAt);
+            return new Portfolio(id, name, description, userId, holdings, createdAt, updatedAt);
         }
     }
 }

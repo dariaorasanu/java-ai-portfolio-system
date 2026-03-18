@@ -7,17 +7,17 @@ public class PortfolioDTO {
     private Long id;
     private String name;
     private String description;
-    private List<StockDTO> stocks;
+    private List<HoldingDTO> holdings;
     private LocalDateTime createdAt;
 
     public PortfolioDTO() {
     }
 
-    public PortfolioDTO(Long id, String name, String description, List<StockDTO> stocks, LocalDateTime createdAt) {
+    public PortfolioDTO(Long id, String name, String description, List<HoldingDTO> holdings, LocalDateTime createdAt) {
         this.id = id;
         this.name = name;
         this.description = description;
-        this.stocks = stocks;
+        this.holdings = holdings;
         this.createdAt = createdAt;
     }
 
@@ -45,12 +45,12 @@ public class PortfolioDTO {
         this.description = description;
     }
 
-    public List<StockDTO> getStocks() {
-        return stocks;
+    public List<HoldingDTO> getHoldings() {
+        return holdings;
     }
 
-    public void setStocks(List<StockDTO> stocks) {
-        this.stocks = stocks;
+    public void setHoldings(List<HoldingDTO> holdings) {
+        this.holdings = holdings;
     }
 
     public LocalDateTime getCreatedAt() {

@@ -6,7 +6,8 @@ import jakarta.validation.constraints.NotBlank;
 
 import java.math.BigDecimal;
 
-public class AddStockRequest {
+public class BuyStockRequest {
+
     @NotBlank(message = "Symbol is required")
     private String symbol;
 
@@ -16,10 +17,10 @@ public class AddStockRequest {
     @DecimalMin(value = "0.01", message = "Purchase price must be positive")
     private BigDecimal purchasePrice;
 
-    public AddStockRequest() {
+    public BuyStockRequest() {
     }
 
-    public AddStockRequest(String symbol, Integer quantity, BigDecimal purchasePrice) {
+    public BuyStockRequest(String symbol, Integer quantity, BigDecimal purchasePrice) {
         this.symbol = symbol;
         this.quantity = quantity;
         this.purchasePrice = purchasePrice;
@@ -36,5 +37,4 @@ public class AddStockRequest {
     public BigDecimal getPurchasePrice() {
         return purchasePrice;
     }
-
 }

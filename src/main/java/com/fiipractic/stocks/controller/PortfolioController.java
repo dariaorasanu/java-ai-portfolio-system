@@ -1,6 +1,6 @@
 package com.fiipractic.stocks.controller;
 
-import com.fiipractic.stocks.dto.AddStockRequest;
+import com.fiipractic.stocks.dto.BuyStockRequest;
 import com.fiipractic.stocks.dto.CreatePortfolioRequest;
 import com.fiipractic.stocks.dto.PortfolioDTO;
 import com.fiipractic.stocks.service.PortfolioService;
@@ -42,10 +42,16 @@ public class PortfolioController {
     }
 
     @PostMapping("/{portfolioId}/stocks")
-    public ResponseEntity<PortfolioDTO> addStock(
+    public ResponseEntity<PortfolioDTO> buyStock(
             @AuthenticationPrincipal Jwt jwt,
             @PathVariable Long portfolioId,
-            @Valid @RequestBody AddStockRequest request) {
-        return ResponseEntity.ok(portfolioService.addStock(jwt.getSubject(), portfolioId, request));
+            @Valid @RequestBody BuyStockRequest request) {
+        return ResponseEntity.ok(portfolioService.buyStock(jwt.getSubject(), portfolioId, request));
+    }
+
+    @GetMapping("/all")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<PortfolioDTO>> getAllPortfolios() {
+        return ResponseEntity.ok(portfolioService.getAllPortfolios());
     }
 }
