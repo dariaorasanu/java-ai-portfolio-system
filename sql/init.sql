@@ -4,7 +4,7 @@ GRANT ALL PRIVILEGES ON SCHEMA stocks TO stocksuser;
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA stocks TO stocksuser;
 ALTER USER stocksuser SET search_path = stocks;
 
--- separate scheam for keycloak
+-- separate schema for keycloak
 CREATE SCHEMA IF NOT EXISTS keycloak;
 CREATE USER keycloakuser WITH PASSWORD 'keycloakpassword';
 GRANT ALL PRIVILEGES ON SCHEMA keycloak TO keycloakuser;
