@@ -22,7 +22,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8080/realms/stock
+          issuer-uri: http://localhost:8082/realms/stock
 
 server:
   port: 8081
