@@ -49,7 +49,7 @@ public class PriceRefreshPublisher {
 
         for (var stock : stocks) {
             PriceRefreshMessage message = new PriceRefreshMessage(
-                    stock.getSymbol(),
+                    stock.symbol(),
                     LocalDateTime.now(),
                     requestedBy
             );
@@ -60,7 +60,7 @@ public class PriceRefreshPublisher {
                     message
             );
 
-            log.info("[PRODUCER] Queued price refresh for [{}] by user [{}]", stock.getSymbol(), requestedBy);
+            log.info("[PRODUCER] Queued price refresh for [{}] by user [{}]", stock.symbol(), requestedBy);
         }
     }
 }

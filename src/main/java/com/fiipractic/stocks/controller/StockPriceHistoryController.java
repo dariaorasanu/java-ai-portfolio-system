@@ -3,6 +3,7 @@ package com.fiipractic.stocks.controller;
 import com.fiipractic.stocks.dto.FetchHistoryResponse;
 import com.fiipractic.stocks.dto.StockHistoryResponse;
 import com.fiipractic.stocks.service.StockPriceHistoryService;
+
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

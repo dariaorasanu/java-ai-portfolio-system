@@ -10,9 +10,6 @@ public class StockHistoryResponse {
     private List<StockPriceHistoryDTO> history;
     private int totalDays;
 
-    public StockHistoryResponse() {
-    }
-
     public StockHistoryResponse(String symbol, List<StockPriceHistoryDTO> history) {
         this.symbol = symbol;
         this.history = history;

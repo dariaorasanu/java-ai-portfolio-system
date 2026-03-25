@@ -50,7 +50,7 @@ public class PriceRefreshConsumer {
             @Header(AmqpHeaders.DELIVERY_TAG) long deliveryTag) throws IOException {
 
         log.info("[CONSUMER] Processing [{}] requested by [{}] on thread: {}",
-                message.getSymbol(), message.getRequestedBy(),
+                message.symbol(), message.requestedBy(),
                 Thread.currentThread().getName());
         try {
             Thread.sleep(1000);
@@ -60,25 +60,25 @@ public class PriceRefreshConsumer {
 
         try {
             // fetch latest price from Alpha Vantage
-            BigDecimal price = alphaVantageClient.fetchLatestPrice(message.getSymbol());
+            BigDecimal price = alphaVantageClient.fetchLatestPrice(message.symbol());
 
             // update the stock entity with current price
-            Stock stock = stockRepository.findBySymbol(message.getSymbol())
-                    .orElseThrow(() -> new RuntimeException("Stock not found: " + message.getSymbol()));
+            Stock stock = stockRepository.findBySymbol(message.symbol())
+                    .orElseThrow(() -> new RuntimeException("Stock not found: " + message.symbol()));
 
             stock.setCurrentPrice(price);
             stock.setLastPriceUpdate(LocalDateTime.now());
             stockRepository.save(stock);
 
             log.info("[CONSUMER] Updated price for [{}] to ${} at {}",
-                    message.getSymbol(), price, stock.getLastPriceUpdate());
+                    message.symbol(), price, stock.getLastPriceUpdate());
 
             // acknowledge message, successfull message
             channel.basicAck(deliveryTag, false);
 
         } catch (Exception e) {
             log.error("[CONSUMER] Failed to fetch price for [{}]: {}",
-                    message.getSymbol(), e.getMessage());
+                    message.symbol(), e.getMessage());
 
             // negative acknowledge - drop the message, might be nice to queue in a dead letter queue for later analysis
             channel.basicNack(deliveryTag, false, false);
