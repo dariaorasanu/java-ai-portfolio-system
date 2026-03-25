@@ -2,6 +2,9 @@ package com.fiipractic.stocks.model;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 import java.util.Objects;
 
 @Entity
@@ -14,23 +17,57 @@ public class Stock {
     @Column(nullable = false, unique = true)
     private String symbol;
 
+    @Column(name = "current_price")
+    private BigDecimal currentPrice;
+
+    @Column(name = "last_price_update")
+    private LocalDateTime lastPriceUpdate;
+
     public Stock() {
     }
 
-    public Stock(Long id, String symbol) {
+    public Stock(Long id, String symbol, BigDecimal currentPrice, LocalDateTime lastPriceUpdate) {
         this.id = id;
         this.symbol = symbol;
+        this.currentPrice = currentPrice;
+        this.lastPriceUpdate = lastPriceUpdate;
     }
 
     public static Builder builder() {
         return new Builder();
     }
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() {
+        return id;
+    }
 
-    public String getSymbol() { return symbol; }
-    public void setSymbol(String symbol) { this.symbol = symbol; }
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getSymbol() {
+        return symbol;
+    }
+
+    public void setSymbol(String symbol) {
+        this.symbol = symbol;
+    }
+
+    public BigDecimal getCurrentPrice() {
+        return currentPrice;
+    }
+
+    public void setCurrentPrice(BigDecimal currentPrice) {
+        this.currentPrice = currentPrice;
+    }
+
+    public LocalDateTime getLastPriceUpdate() {
+        return lastPriceUpdate;
+    }
+
+    public void setLastPriceUpdate(LocalDateTime lastPriceUpdate) {
+        this.lastPriceUpdate = lastPriceUpdate;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -48,12 +85,31 @@ public class Stock {
     public static class Builder {
         private Long id;
         private String symbol;
+        private BigDecimal currentPrice;
+        private LocalDateTime lastPriceUpdate;
 
-        public Builder id(Long id) { this.id = id; return this; }
-        public Builder symbol(String symbol) { this.symbol = symbol; return this; }
+        public Builder id(Long id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder symbol(String symbol) {
+            this.symbol = symbol;
+            return this;
+        }
+
+        public Builder currentPrice(BigDecimal currentPrice) {
+            this.currentPrice = currentPrice;
+            return this;
+        }
+
+        public Builder lastPriceUpdate(LocalDateTime lastPriceUpdate) {
+            this.lastPriceUpdate = lastPriceUpdate;
+            return this;
+        }
 
         public Stock build() {
-            return new Stock(id, symbol);
+            return new Stock(id, symbol, currentPrice, lastPriceUpdate);
         }
     }
 }
