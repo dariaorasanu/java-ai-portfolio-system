@@ -3,7 +3,9 @@ package com.fiipractic.stocks.controller;
 import com.fiipractic.stocks.dto.BuyStockRequest;
 import com.fiipractic.stocks.dto.CreatePortfolioRequest;
 import com.fiipractic.stocks.dto.PortfolioDTO;
+import com.fiipractic.stocks.dto.PortfolioValuationDTO;
 import com.fiipractic.stocks.service.PortfolioService;
+import com.fiipractic.stocks.service.PriceRefreshPublisher;
 
 import jakarta.validation.Valid;
 
@@ -22,7 +24,7 @@ public class PortfolioController {
 
     private final PortfolioService portfolioService;
 
-    public PortfolioController(PortfolioService portfolioService) {
+    public PortfolioController(PortfolioService portfolioService, PriceRefreshPublisher priceRefreshPublisher) {
         this.portfolioService = portfolioService;
     }
 
@@ -53,5 +55,19 @@ public class PortfolioController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<PortfolioDTO>> getAllPortfolios() {
         return ResponseEntity.ok(portfolioService.getAllPortfolios());
+    }
+
+    @GetMapping("/{portfolioId}/valuation")
+    public ResponseEntity<PortfolioValuationDTO> getPortfolioValuation(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable Long portfolioId) {
+        return ResponseEntity.ok(portfolioService.calculateValuation(jwt.getSubject(), portfolioId));
+    }
+
+    @PostMapping("/{portfolioId}/refresh")
+    public ResponseEntity<PortfolioService.RefreshResponseDTO> refreshPortfolioPrices(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable Long portfolioId) {
+        return ResponseEntity.ok(portfolioService.refreshPortfolioPrices(jwt.getSubject(), portfolioId));
     }
 }

@@ -25,6 +25,10 @@
       "email": "johndoe@example.com",
       "firstName": "John",
       "lastName": "Doe",
+      "attributes": {
+        "firstName": ["John"],
+        "lastName": ["Doe"]
+      },
       "credentials": [{ "type": "password", "value": "password", "temporary": false }],
       "realmRoles": ["USER"]
     },
@@ -34,6 +38,10 @@
       "email": "janepremium@example.com",
       "firstName": "Jane",
       "lastName": "Premium",
+      "attributes": {
+        "firstName": ["Jane"],
+        "lastName": ["Premium"]
+      },
       "credentials": [{ "type": "password", "value": "password", "temporary": false }],
       "realmRoles": ["USER", "PREMIUM"]
     },
@@ -43,6 +51,10 @@
       "email": "admin@example.com",
       "firstName": "Admin",
       "lastName": "User",
+      "attributes": {
+        "firstName": ["Admin"],
+        "lastName": ["User"]
+      },
       "credentials": [{ "type": "password", "value": "admin", "temporary": false }],
       "realmRoles": ["USER", "ADMIN"]
     }

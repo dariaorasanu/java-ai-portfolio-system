@@ -24,5 +24,15 @@ spring:
         jwt:
           issuer-uri: http://localhost:8082/realms/stock
 
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: admin
+    password: admin
+
+alphavantage:
+  api-key: i-almost-versioned-my-api-key
+  base-url: https://www.alphavantage.co/query
+
 server:
   port: 8081

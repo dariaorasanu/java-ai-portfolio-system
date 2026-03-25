@@ -69,7 +69,12 @@ public class StockService {
     // converts the entity to a DTO but in this simple case
     // it contains the same fields.
     private StockDTO toDTO(Stock stock) {
-        return new StockDTO(stock.getId(), stock.getSymbol());
+        return new StockDTO(
+                stock.getId(),
+                stock.getSymbol(),
+                stock.getCurrentPrice(),
+                stock.getLastPriceUpdate()
+        );
     }
 }
 

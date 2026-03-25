@@ -24,13 +24,16 @@ public class PortfolioService {
     private final PortfolioRepository portfolioRepository;
     private final PortfolioHoldingRepository portfolioHoldingRepository;
     private final StockService stockService;
+    private final PriceRefreshPublisher priceRefreshPublisher;
 
     public PortfolioService(PortfolioRepository portfolioRepository,
                             PortfolioHoldingRepository portfolioHoldingRepository,
-                            StockService stockService) {
+                            StockService stockService,
+                            PriceRefreshPublisher priceRefreshPublisher) {
         this.portfolioRepository = portfolioRepository;
         this.portfolioHoldingRepository = portfolioHoldingRepository;
         this.stockService = stockService;
+        this.priceRefreshPublisher = priceRefreshPublisher;
     }
 
     @Transactional
@@ -90,6 +93,16 @@ public class PortfolioService {
         return dto;
     }
 
+    private PortfolioDTO toDTO(Portfolio p) {
+        PortfolioDTO dto = new PortfolioDTO();
+        dto.setId(p.getId());
+        dto.setName(p.getName());
+        dto.setDescription(p.getDescription());
+        dto.setCreatedAt(p.getCreatedAt());
+        dto.setHoldings(p.getHoldings().stream().map(this::toHoldingDTO).collect(Collectors.toList()));
+        return dto;
+    }
+
     private HoldingDTO toHoldingDTO(PortfolioHolding h) {
         return new HoldingDTO(
                 h.getId(),
@@ -98,5 +111,8 @@ public class PortfolioService {
                 h.getPurchasePrice(),
                 h.getPurchasedAt()
         );
+    }
+
+    public record RefreshResponseDTO(String portfolioId, List<String> symbolsQueued, int totalSymbols, String message) {
     }
 }
