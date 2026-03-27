@@ -4,9 +4,14 @@ import com.fiipractic.stocks.dto.BuyStockRequest;
 import com.fiipractic.stocks.dto.CreatePortfolioRequest;
 import com.fiipractic.stocks.dto.PortfolioDTO;
 import com.fiipractic.stocks.service.PortfolioService;
+
 import jakarta.validation.Valid;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,25 +28,29 @@ public class PortfolioController {
 
     @PostMapping
     public ResponseEntity<PortfolioDTO> createPortfolio(
-            @RequestParam String username,
+            @AuthenticationPrincipal Jwt jwt,
             @Valid @RequestBody CreatePortfolioRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(portfolioService.createPortfolio(username, request));
+                .body(portfolioService.createPortfolio(jwt.getSubject(), request));
     }
 
-    @GetMapping
-    public ResponseEntity<List<PortfolioDTO>> getUserPortfolios(@RequestParam String username) {
-        return ResponseEntity.ok(portfolioService.getUserPortfolios(username));
+    @GetMapping("/my")
+    @PreAuthorize("hasAnyRole('USER', 'PREMIUM', 'ADMIN')")
+    public ResponseEntity<List<PortfolioDTO>> getMyPortfolios(
+            @AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.ok(portfolioService.getUserPortfolios(jwt.getSubject()));
     }
 
     @PostMapping("/{portfolioId}/stocks")
     public ResponseEntity<PortfolioDTO> buyStock(
+            @AuthenticationPrincipal Jwt jwt,
             @PathVariable Long portfolioId,
             @Valid @RequestBody BuyStockRequest request) {
-        return ResponseEntity.ok(portfolioService.buyStock(portfolioId, request));
+        return ResponseEntity.ok(portfolioService.buyStock(jwt.getSubject(), portfolioId, request));
     }
 
     @GetMapping("/all")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<PortfolioDTO>> getAllPortfolios() {
         return ResponseEntity.ok(portfolioService.getAllPortfolios());
     }

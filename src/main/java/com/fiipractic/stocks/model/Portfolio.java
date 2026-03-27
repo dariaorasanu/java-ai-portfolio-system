@@ -23,9 +23,10 @@ public class Portfolio {
 
     private String description;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    // migrating from User entities which are managed by our application
+    // to keycloak which now manages users. this is the "sub" claim in the JWT token
+    @Column(name = "user_id", nullable = false)
+    private String userId;
 
     @OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<PortfolioHolding> holdings = new ArrayList<>();
@@ -39,11 +40,11 @@ public class Portfolio {
     public Portfolio() {
     }
 
-    public Portfolio(Long id, String name, String description, User user, List<PortfolioHolding> holdings, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public Portfolio(Long id, String name, String description, String userId, List<PortfolioHolding> holdings, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.name = name;
         this.description = description;
-        this.user = user;
+        this.userId = userId;
         this.holdings = holdings;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -77,12 +78,12 @@ public class Portfolio {
         this.description = description;
     }
 
-    public User getUser() {
-        return user;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public List<PortfolioHolding> getHoldings() {
@@ -126,7 +127,7 @@ public class Portfolio {
         private Long id;
         private String name;
         private String description;
-        private User user;
+        private String userId;
         private List<PortfolioHolding> holdings;
         private LocalDateTime createdAt;
         private LocalDateTime updatedAt;
@@ -146,8 +147,8 @@ public class Portfolio {
             return this;
         }
 
-        public Builder user(User user) {
-            this.user = user;
+        public Builder userId(String userId) {
+            this.userId = userId;
             return this;
         }
 
@@ -167,7 +168,7 @@ public class Portfolio {
         }
 
         public Portfolio build() {
-            return new Portfolio(id, name, description, user, holdings, createdAt, updatedAt);
+            return new Portfolio(id, name, description, userId, holdings, createdAt, updatedAt);
         }
     }
 }

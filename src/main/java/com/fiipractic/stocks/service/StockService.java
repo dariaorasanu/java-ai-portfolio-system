@@ -27,6 +27,7 @@ public class StockService {
         if (stockRepository.findBySymbol(normalized).isPresent()) {
             throw new StockAlreadyExistsException("Stock with symbol '" + normalized + "' already exists");
         }
+
         Stock saved = stockRepository.save(Stock.builder().symbol(normalized).build());
         return toDTO(saved);
     }
@@ -38,8 +39,7 @@ public class StockService {
 
     @Transactional(readOnly = true)
     public StockDTO getStockById(Long id) {
-        Stock stock = stockRepository.findById(id)
-                .orElseThrow(() -> new StockNotFoundException("Stock not found with id: " + id));
+        Stock stock = stockRepository.findById(id).orElseThrow(() -> new StockNotFoundException("Stock not found with id: " + id));
         return toDTO(stock);
     }
 
@@ -51,8 +51,7 @@ public class StockService {
 
     @Transactional
     public StockDTO updateStock(Long id, String symbol) {
-        Stock stock = stockRepository.findById(id)
-                .orElseThrow(() -> new StockNotFoundException("Stock not found with id: " + id));
+        Stock stock = stockRepository.findById(id).orElseThrow(() -> new StockNotFoundException("Stock not found with id: " + id));
         stock.setSymbol(symbol.toUpperCase());
         return toDTO(stockRepository.save(stock));
     }
@@ -64,11 +63,13 @@ public class StockService {
 
     Stock findOrCreate(String symbol) {
         String normalized = symbol.toUpperCase();
-        return stockRepository.findBySymbol(normalized)
-                .orElseGet(() -> stockRepository.save(Stock.builder().symbol(normalized).build()));
+        return stockRepository.findBySymbol(normalized).orElseGet(() -> stockRepository.save(Stock.builder().symbol(normalized).build()));
     }
 
-    private StockDTO toDTO(Stock s) {
-        return new StockDTO(s.getId(), s.getSymbol());
+    // converts the entity to a DTO but in this simple case
+    // it contains the same fields.
+    private StockDTO toDTO(Stock stock) {
+        return new StockDTO(stock.getId(), stock.getSymbol());
     }
 }
+

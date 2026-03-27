@@ -4,15 +4,12 @@ import com.fiipractic.stocks.dto.BuyStockRequest;
 import com.fiipractic.stocks.dto.CreatePortfolioRequest;
 import com.fiipractic.stocks.dto.HoldingDTO;
 import com.fiipractic.stocks.dto.PortfolioDTO;
-import com.fiipractic.stocks.exception.PortfolioNotFoundException;
-import com.fiipractic.stocks.exception.UserNotFoundException;
+import com.fiipractic.stocks.exception.UserNotOwnerOfPortfolioException;
 import com.fiipractic.stocks.model.Portfolio;
 import com.fiipractic.stocks.model.PortfolioHolding;
 import com.fiipractic.stocks.model.Stock;
-import com.fiipractic.stocks.model.User;
 import com.fiipractic.stocks.repository.PortfolioHoldingRepository;
 import com.fiipractic.stocks.repository.PortfolioRepository;
-import com.fiipractic.stocks.repository.UserRepository;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,41 +22,31 @@ import java.util.stream.Collectors;
 public class PortfolioService {
 
     private final PortfolioRepository portfolioRepository;
-    private final UserRepository userRepository;
-    private final PortfolioHoldingRepository holdingRepository;
+    private final PortfolioHoldingRepository portfolioHoldingRepository;
     private final StockService stockService;
 
     public PortfolioService(PortfolioRepository portfolioRepository,
-                           UserRepository userRepository,
-                           PortfolioHoldingRepository holdingRepository,
-                           StockService stockService) {
+                            PortfolioHoldingRepository portfolioHoldingRepository,
+                            StockService stockService) {
         this.portfolioRepository = portfolioRepository;
-        this.userRepository = userRepository;
-        this.holdingRepository = holdingRepository;
+        this.portfolioHoldingRepository = portfolioHoldingRepository;
         this.stockService = stockService;
     }
 
     @Transactional
-    public PortfolioDTO createPortfolio(String username, CreatePortfolioRequest portfolioRequest) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException("User not found: " + username));
-
+    public PortfolioDTO createPortfolio(String userId, CreatePortfolioRequest request) {
         Portfolio portfolio = Portfolio.builder()
-                .name(portfolioRequest.getName())
-                .description(portfolioRequest.getDescription())
-                .user(user)
+                .name(request.getName())
+                .description(request.getDescription())
                 .holdings(new ArrayList<>())
+                .userId(userId)
                 .build();
-
         return toDTO(portfolioRepository.save(portfolio));
     }
 
     @Transactional(readOnly = true)
-    public List<PortfolioDTO> getUserPortfolios(String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException("User not found: " + username));
-
-        return portfolioRepository.findByUserId(user.getId())
+    public List<PortfolioDTO> getUserPortfolios(String userId) {
+        return portfolioRepository.findByUserId(userId)
                 .stream().map(this::toDTO).collect(Collectors.toList());
     }
 
@@ -72,14 +59,14 @@ public class PortfolioService {
     }
 
     @Transactional
-    public PortfolioDTO buyStock(Long portfolioId, BuyStockRequest request) {
+    public PortfolioDTO buyStock(String userId, Long portfolioId, BuyStockRequest request) {
         Portfolio portfolio = portfolioRepository.findById(portfolioId)
-                .orElseThrow(() -> new PortfolioNotFoundException("Portfolio not found: " + portfolioId));
+                .filter(p -> p.getUserId().equals(userId))
+                .orElseThrow(() -> new UserNotOwnerOfPortfolioException("User is not owner of portfolio or portfolio does not exist"));
 
-        // Find or create the stock in the catalog
+        // find existing stock by symbol, or create it if it doesn't exist yet
         Stock stock = stockService.findOrCreate(request.getSymbol());
 
-        // Create a new holding (purchase lot)
         PortfolioHolding holding = PortfolioHolding.builder()
                 .portfolio(portfolio)
                 .stock(stock)
@@ -87,7 +74,7 @@ public class PortfolioService {
                 .purchasePrice(request.getPurchasePrice())
                 .build();
 
-        holdingRepository.save(holding);
+        portfolioHoldingRepository.save(holding);
         portfolio.getHoldings().add(holding);
 
         return toDTO(portfolio);
@@ -105,11 +92,11 @@ public class PortfolioService {
 
     private HoldingDTO toHoldingDTO(PortfolioHolding h) {
         return new HoldingDTO(
-            h.getId(),
-            h.getStock().getSymbol(),
-            h.getQuantity(),
-            h.getPurchasePrice(),
-            h.getPurchasedAt()
+                h.getId(),
+                h.getStock().getSymbol(),
+                h.getQuantity(),
+                h.getPurchasePrice(),
+                h.getPurchasedAt()
         );
     }
 }

@@ -36,3 +36,4 @@ public class HoldingDTO {
     public LocalDateTime getPurchasedAt() { return purchasedAt; }
     public void setPurchasedAt(LocalDateTime purchasedAt) { this.purchasedAt = purchasedAt; }
 }
+
