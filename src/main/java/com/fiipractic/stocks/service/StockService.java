@@ -9,17 +9,26 @@ import com.fiipractic.stocks.repository.StockRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.time.LocalDateTime;
 
 @Service
 public class StockService {
 
     private final StockRepository stockRepository;
+    private final AlphaVantageClient alphaVantageClient;
 
-    public StockService(StockRepository stockRepository) {
+    public StockService(StockRepository stockRepository, AlphaVantageClient alphaVantageClient) {
         this.stockRepository = stockRepository;
+        this.alphaVantageClient = alphaVantageClient;
     }
+    //public StockService(StockRepository stockRepository) {
+   //     this.stockRepository = stockRepository;
+    //}
+
+
 
     @Transactional
     public StockDTO createStock(String symbol) {
@@ -31,6 +40,7 @@ public class StockService {
         Stock saved = stockRepository.save(Stock.builder().symbol(normalized).build());
         return toDTO(saved);
     }
+
 
     @Transactional(readOnly = true)
     public List<StockDTO> getAllStocks() {
@@ -66,10 +76,31 @@ public class StockService {
         return stockRepository.findBySymbol(normalized).orElseGet(() -> stockRepository.save(Stock.builder().symbol(normalized).build()));
     }
 
+
+    @Transactional
+    public StockDTO refreshPrice(String symbol) {
+        String normalized = symbol.toUpperCase();
+
+        Stock stock = stockRepository.findBySymbol(normalized)
+                .orElseThrow(() -> new StockNotFoundException("Stock not found: " + normalized));
+
+        // Call Alpha Vantage API directly
+        BigDecimal price = alphaVantageClient.fetchLatestPrice(normalized);
+
+        // Update the stock
+        stock.setCurrentPrice(price);
+        stock.setLastPriceUpdate(LocalDateTime.now());
+
+        return toDTO(stockRepository.save(stock));
+    }
     // converts the entity to a DTO but in this simple case
     // it contains the same fields.
     private StockDTO toDTO(Stock stock) {
-        return new StockDTO(stock.getId(), stock.getSymbol());
-    }
-}
+        return new StockDTO(
+                stock.getId(),
+                stock.getSymbol(),
+                stock.getCurrentPrice(),
+                stock.getLastPriceUpdate()
+        );
+    }}
 

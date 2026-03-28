@@ -10,12 +10,15 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @RestController
 @RequestMapping("/api/stocks")
 public class StockController {
 
     private final StockService stockService;
-
+    private static final Logger log = LoggerFactory.getLogger(StockController.class);
     public StockController(StockService stockService) {
         this.stockService = stockService;
     }
@@ -46,5 +49,13 @@ public class StockController {
         stockService.deleteStock(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/{symbol}/refresh")
+    public ResponseEntity<StockDTO> refreshPrice(@PathVariable String symbol) {
+        log.info("Refreshing price for symbol: {}", symbol);
+        StockDTO updated = stockService.refreshPrice(symbol);
+        return ResponseEntity.ok(updated);
+    }
+
 }
 

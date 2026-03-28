@@ -1,20 +1,7 @@
 package com.fiipractic.stocks.dto;
 
-public class StockDTO {
-    private Long id;
-    private String symbol;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
-    public StockDTO() {
-    }
-
-    public StockDTO(Long id, String symbol) {
-        this.id = id;
-        this.symbol = symbol;
-    }
-
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-
-    public String getSymbol() { return symbol; }
-    public void setSymbol(String symbol) { this.symbol = symbol; }
+public record StockDTO(Long id, String symbol, BigDecimal currentPrice, LocalDateTime lastPriceUpdate) {
 }

@@ -2,6 +2,8 @@ package com.fiipractic.stocks.model;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
@@ -13,6 +15,12 @@ public class Stock {
 
     @Column(nullable = false, unique = true)
     private String symbol;
+    @Column(name = "current_price")
+    private BigDecimal currentPrice;
+
+    @Column(name = "last_price_update")
+    private LocalDateTime lastPriceUpdate;
+
 
     public Stock() {
     }
@@ -31,6 +39,21 @@ public class Stock {
 
     public String getSymbol() { return symbol; }
     public void setSymbol(String symbol) { this.symbol = symbol; }
+    public BigDecimal getCurrentPrice() {
+        return currentPrice;
+    }
+
+    public void setCurrentPrice(BigDecimal currentPrice) {
+        this.currentPrice = currentPrice;
+    }
+
+    public LocalDateTime getLastPriceUpdate() {
+        return lastPriceUpdate;
+    }
+
+    public void setLastPriceUpdate(LocalDateTime lastPriceUpdate) {
+        this.lastPriceUpdate = lastPriceUpdate;
+    }
 
     @Override
     public boolean equals(Object o) {

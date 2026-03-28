@@ -23,6 +23,9 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:8082/realms/stock
+alphavantage:
+  api-key: AQWFKE1B7XN0CAH3
+  base-url: https://www.alphavantage.co/query
 
 server:
   port: 8081
