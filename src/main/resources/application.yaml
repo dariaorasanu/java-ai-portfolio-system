@@ -31,8 +31,13 @@ spring:
     password: admin
 
 alphavantage:
-  api-key: i-almost-versioned-my-api-key
+  api-key: AQWFKE1B7XN0CAH3
   base-url: https://www.alphavantage.co/query
+
+logbull:
+  host: http://localhost:4005
+  project-id: 868a19bc-b157-4678-a507-374b88eab289
+  api-key: lb_19e1943b3f7c48636b320881f417f24d
 
 server:
   port: 8081

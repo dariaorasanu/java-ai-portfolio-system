@@ -173,7 +173,7 @@ public class PortfolioService {
         );
     }
 
-    public RefreshResponseDTO refreshPortfolioPrices(String userId, Long portfolioId) {
+    public RefreshResponseDTO refreshPortfolioPrices(String userId, Long portfolioId, String correlationId) {
         Portfolio portfolio = portfolioRepository.findById(portfolioId)
                 .filter(p -> p.getUserId().equals(userId))
                 .orElseThrow(() -> new UserNotOwnerOfPortfolioException("Portfolio not found or access denied"));
@@ -184,7 +184,7 @@ public class PortfolioService {
                 .toList();
 
         // queue refresh for each symbol
-        symbols.forEach(symbol -> priceRefreshPublisher.publishRefresh(symbol, userId));
+        symbols.forEach(symbol -> priceRefreshPublisher.publishRefresh(symbol, userId, correlationId));
 
         return new RefreshResponseDTO(
                 portfolioId.toString(), symbols, symbols.size(), "Price refresh queued for " + symbols.size() + " stocks");

@@ -67,7 +67,9 @@ public class PortfolioController {
     @PostMapping("/{portfolioId}/refresh")
     public ResponseEntity<PortfolioService.RefreshResponseDTO> refreshPortfolioPrices(
             @AuthenticationPrincipal Jwt jwt,
-            @PathVariable Long portfolioId) {
-        return ResponseEntity.ok(portfolioService.refreshPortfolioPrices(jwt.getSubject(), portfolioId));
+            @PathVariable Long portfolioId,
+            String correlationId
+            ) {
+        return ResponseEntity.ok(portfolioService.refreshPortfolioPrices(jwt.getSubject(), portfolioId, correlationId));
     }
 }

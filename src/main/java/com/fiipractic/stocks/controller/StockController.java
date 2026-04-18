@@ -3,7 +3,10 @@ package com.fiipractic.stocks.controller;
 import com.fiipractic.stocks.dto.StockDTO;
 import com.fiipractic.stocks.service.PriceRefreshPublisher;
 import com.fiipractic.stocks.service.StockService;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
+import java.util.UUID;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +23,7 @@ public class StockController {
 
     private final StockService stockService;
     private final PriceRefreshPublisher priceRefreshPublisher;
-
+    private static final Logger log = LoggerFactory.getLogger(StockController.class);
     public StockController(StockService stockService, PriceRefreshPublisher priceRefreshPublisher) {
         this.stockService = stockService;
         this.priceRefreshPublisher = priceRefreshPublisher;
@@ -55,8 +58,9 @@ public class StockController {
 
     @PostMapping("/refresh")
     public ResponseEntity<Map<String, String>> refreshAllPrices(@AuthenticationPrincipal Jwt jwt) {
+        final String correlationId = UUID.randomUUID().toString();
         String userId = jwt.getSubject();
-        priceRefreshPublisher.publishRefreshAll(userId);
+        priceRefreshPublisher.publishRefreshAll(userId, correlationId);
         return ResponseEntity.accepted()
                 .body(Map.of(
                         "status", "QUEUED",
@@ -69,12 +73,27 @@ public class StockController {
             @AuthenticationPrincipal Jwt jwt,
             @PathVariable String symbol) {
         String userId = jwt.getSubject();
-        priceRefreshPublisher.publishRefresh(symbol, userId);
+        String correlationId = UUID.randomUUID().toString();
+
+        // Log with structured fields using MDC
+        try {
+            MDC.put("action", "refresh_requested");
+            MDC.put("symbol", symbol.toUpperCase());
+            MDC.put("userId", userId);
+            MDC.put("correlationId", correlationId);
+            log.info("Price refresh requested for {}", symbol.toUpperCase());
+        } finally {
+            MDC.clear();  // Always clear to prevent field leakage
+        }
+
+        priceRefreshPublisher.publishRefresh(symbol, userId, correlationId);
+
         return ResponseEntity.accepted()
                 .body(Map.of(
                         "status", "QUEUED",
                         "symbol", symbol.toUpperCase(),
-                        "message", "Price refresh request queued"
+                        "message", "Price refresh request queued",
+                        "correlationId", correlationId
                 ));
     }
 }
