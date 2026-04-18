@@ -13,7 +13,9 @@ import com.fiipractic.stocks.model.PortfolioHolding;
 import com.fiipractic.stocks.model.Stock;
 import com.fiipractic.stocks.repository.PortfolioHoldingRepository;
 import com.fiipractic.stocks.repository.PortfolioRepository;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +36,7 @@ public class PortfolioService {
     private final PortfolioHoldingRepository portfolioHoldingRepository;
     private final StockService stockService;
     private final PriceRefreshPublisher priceRefreshPublisher;
+    private static final Logger log = LoggerFactory.getLogger(PortfolioService.class);
 
     public PortfolioService(PortfolioRepository portfolioRepository,
                             PortfolioHoldingRepository portfolioHoldingRepository,
@@ -53,7 +56,20 @@ public class PortfolioService {
                 .holdings(new ArrayList<>())
                 .userId(userId)
                 .build();
-        return toDTO(portfolioRepository.save(portfolio));
+
+        Portfolio saved = portfolioRepository.save(portfolio);
+
+        try {
+            MDC.put("action", "portfolio_created");
+            MDC.put("userId", userId);
+            MDC.put("portfolioId", saved.getId().toString());
+            MDC.put("portfolioName", saved.getName());
+            log.info("Portfolio created: {}", saved.getName());
+        } finally {
+            MDC.clear();
+        }
+
+        return toDTO(saved);
     }
 
     @Transactional(readOnly = true)
@@ -101,9 +117,11 @@ public class PortfolioService {
     @Transactional(readOnly = true)
     public PortfolioValuationDTO calculateValuation(String userId, Long portfolioId) {
         Portfolio portfolio = portfolioRepository.findById(portfolioId)
-                .filter(p -> p.getUserId().equals(userId))
-                .orElseThrow(() -> new UserNotOwnerOfPortfolioException("Portfolio not found or access denied"));
+                .orElseThrow(() -> new PortfolioNotFoundException("Portfolio not found: " + portfolioId));
 
+        if (!portfolio.getUserId().equals(userId)) {
+            throw new UserNotOwnerOfPortfolioException("Portfolio not found or access denied");
+        }
         // group holdings by stock symbol
         Map<String, List<PortfolioHolding>> holdingsBySymbol = portfolio.getHoldings().stream()
                 .collect(Collectors.groupingBy(h -> h.getStock().getSymbol()));
