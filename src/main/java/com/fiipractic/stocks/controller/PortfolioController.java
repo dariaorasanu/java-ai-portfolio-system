@@ -1,5 +1,9 @@
 package com.fiipractic.stocks.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
+import java.util.UUID;
 import com.fiipractic.stocks.dto.BuyStockRequest;
 import com.fiipractic.stocks.dto.CreatePortfolioRequest;
 import com.fiipractic.stocks.dto.PortfolioDTO;
@@ -23,7 +27,7 @@ import java.util.List;
 public class PortfolioController {
 
     private final PortfolioService portfolioService;
-
+    private static final Logger log = LoggerFactory.getLogger(PortfolioController.class);
     public PortfolioController(PortfolioService portfolioService, PriceRefreshPublisher priceRefreshPublisher) {
         this.portfolioService = portfolioService;
     }
@@ -67,9 +71,23 @@ public class PortfolioController {
     @PostMapping("/{portfolioId}/refresh")
     public ResponseEntity<PortfolioService.RefreshResponseDTO> refreshPortfolioPrices(
             @AuthenticationPrincipal Jwt jwt,
-            @PathVariable Long portfolioId,
-            String correlationId
-            ) {
-        return ResponseEntity.ok(portfolioService.refreshPortfolioPrices(jwt.getSubject(), portfolioId, correlationId));
+            @PathVariable Long portfolioId) {
+
+        String userId = jwt.getSubject();
+        String correlationId = UUID.randomUUID().toString();
+
+        try {
+            MDC.put("action", "portfolio_refresh_requested");
+            MDC.put("portfolioId", portfolioId.toString());
+            MDC.put("userId", userId);
+            MDC.put("correlationId", correlationId);
+            log.info("Portfolio refresh requested for portfolio {}", portfolioId);
+        } finally {
+            MDC.clear();
+        }
+
+        return ResponseEntity.ok(
+                portfolioService.refreshPortfolioPrices(userId, portfolioId, correlationId)
+        );
     }
 }

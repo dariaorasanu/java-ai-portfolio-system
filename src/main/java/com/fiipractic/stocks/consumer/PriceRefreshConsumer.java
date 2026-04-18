@@ -56,7 +56,6 @@ public class PriceRefreshConsumer {
                 message.symbol(), message.requestedBy(), correlationId,
                 Thread.currentThread().getName());
 
-        // Log processing start with MDC
         try {
             MDC.put("action", "price_processing_started");
             MDC.put("symbol", message.symbol());
@@ -70,7 +69,7 @@ public class PriceRefreshConsumer {
         long startTime = System.currentTimeMillis();
 
         try {
-            // ... existing API call and database update code ...
+            Thread.sleep(1000);
 
             BigDecimal price = alphaVantageClient.fetchLatestPrice(message.symbol());
             long durationMs = System.currentTimeMillis() - startTime;
@@ -82,7 +81,6 @@ public class PriceRefreshConsumer {
             stock.setLastPriceUpdate(LocalDateTime.now());
             stockRepository.save(stock);
 
-            // Log success with MDC
             try {
                 MDC.put("action", "price_stored");
                 MDC.put("symbol", message.symbol());
@@ -95,7 +93,6 @@ public class PriceRefreshConsumer {
                 MDC.clear();
             }
 
-            // Log warning if slow
             if (durationMs > SLOW_API_THRESHOLD_MS) {
                 try {
                     MDC.put("action", "slow_api_call");
@@ -114,7 +111,6 @@ public class PriceRefreshConsumer {
         } catch (Exception e) {
             long durationMs = System.currentTimeMillis() - startTime;
 
-            // Log error with MDC
             try {
                 MDC.put("action", "price_fetch_failed");
                 MDC.put("symbol", message.symbol());

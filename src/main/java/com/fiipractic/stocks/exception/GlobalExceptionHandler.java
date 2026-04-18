@@ -1,5 +1,8 @@
 package com.fiipractic.stocks.exception;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -14,8 +17,18 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleUserNotFoundException(UserNotFoundException ex) {
+        try {
+            MDC.put("action", "user_not_found");
+            MDC.put("errorType", "UserNotFoundException");
+            MDC.put("httpStatus", "404");
+            log.error("User not found: {}", ex.getMessage());
+        } finally {
+            MDC.clear();
+        }
+
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.NOT_FOUND.value(),
                 ex.getMessage(),
@@ -26,11 +39,21 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(PortfolioNotFoundException.class)
     public ResponseEntity<ErrorResponse> handlePortfolioNotFoundException(PortfolioNotFoundException ex) {
+        try {
+            MDC.put("action", "portfolio_not_found");
+            MDC.put("errorType", "PortfolioNotFoundException");
+            MDC.put("httpStatus", "404");
+            log.error("Portfolio not found: {}", ex.getMessage());
+        } finally {
+            MDC.clear();
+        }
+
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.NOT_FOUND.value(),
                 ex.getMessage(),
                 LocalDateTime.now()
         );
+
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
@@ -72,4 +95,45 @@ public class GlobalExceptionHandler {
             LocalDateTime timestamp,
             Map<String, String> errors
     ) {}
+
+    @ExceptionHandler(UserNotOwnerOfPortfolioException.class)
+    public ResponseEntity<ErrorResponse> handleUserNotOwnerOfPortfolioException(UserNotOwnerOfPortfolioException ex) {
+        try {
+            MDC.put("action", "unauthorized");
+            MDC.put("errorType", "UserNotOwnerOfPortfolioException");
+            MDC.put("httpStatus", "403");
+            log.error("Unauthorized access: {}", ex.getMessage());
+        } finally {
+            MDC.clear();
+        }
+
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.FORBIDDEN.value(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+    }
+
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
+        try {
+            MDC.put("action", "unexpected_error");
+            MDC.put("errorType", ex.getClass().getSimpleName());
+            MDC.put("httpStatus", "500");
+            log.error("Unexpected error occurred", ex);
+        } finally {
+            MDC.clear();
+        }
+
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "An unexpected error occurred",
+                LocalDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+    }
+
 }
