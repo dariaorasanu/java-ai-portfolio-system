@@ -74,13 +74,13 @@ public class PortfolioService {
 
     @Transactional(readOnly = true)
     public List<PortfolioDTO> getUserPortfolios(String userId) {
-        return portfolioRepository.findByUserId(userId)
+        return portfolioRepository.findByUserIdWithHoldings(userId)
                 .stream().map(this::toDTO).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public List<PortfolioDTO> getAllPortfolios() {
-        return portfolioRepository.findAll()
+        return portfolioRepository.findAllPortfolios()
                 .stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
